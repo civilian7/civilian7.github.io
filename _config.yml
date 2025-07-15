@@ -9,9 +9,9 @@
 # Basic Site Settings
 locale                   : "ko-KR"
 site_theme               : "default"
-title                    : "시골프로그래머"
+title                    : "시골프로그래머의 블로그"
 title_separator          : "-"
-name                     : &name "Your Name"
+name                     : &name "시골프로그래머"
 description              : &description "personal description"
 url                      : https://civilian7.github.io # the base hostname & protocol for your site e.g. "https://[your GitHub username].github.io" or if you already have some other page hosted on Github then use "https://[your GitHub username].github.io/[Your Repo Name]"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
@@ -24,7 +24,7 @@ author:
   # Biographic information
   avatar           : "profile.png"
   name             : "시골프로그래머"
-  pronouns         : # example: "she/her"  
+  pronouns         : "she" # example: "she/her"  
   bio              : "Short biography for the left-hand sidebar"
   location         : "Hanam-si, Gyunggi-do"
   employer         : "FullBit Computing"
@@ -34,11 +34,11 @@ author:
   # Academic websites
   academia         : # URL
   arxiv            : # URL - Update with the correct link to your profile
-  googlescholar    : "https://scholar.google.com/citations?user=PS_CX0AAAAAJ"
+  googlescholar    : # "https://scholar.google.com/citations?user=PS_CX0AAAAAJ"
   impactstory      : # URL
-  orcid            : "http://orcid.org/yourorcidurl"
+  orcid            : # "http://orcid.org/yourorcidurl"
   semantic         : # URL
-  pubmed           : "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow"
+  pubmed           : # "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow"
   researchgate     : # URL
   scopus           : # URL
 
