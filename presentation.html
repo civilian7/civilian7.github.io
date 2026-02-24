@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forge Template — Full-Stack Board Platform</title>
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,700&display=swap">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (BOLD SIGNAL THEME)
+           Vibrant accent card on deep dark background
+           =========================================== */
+        :root {
+            --bg-primary: #08090d;
+            --bg-card: #12141c;
+            --bg-card-hover: #1a1d28;
+            --text-primary: #f0f0f5;
+            --text-secondary: #7a7d8e;
+            --text-muted: #4a4d5e;
+            --accent: #00e5a0;
+            --accent-secondary: #00b8ff;
+            --accent-warm: #ff6b35;
+            --accent-glow: rgba(0, 229, 160, 0.15);
+            --accent-glow-strong: rgba(0, 229, 160, 0.3);
+            --gradient-accent: linear-gradient(135deg, #00e5a0, #00b8ff);
+            --gradient-warm: linear-gradient(135deg, #ff6b35, #ff3366);
+            --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-accent: rgba(0, 229, 160, 0.3);
+
+            /* Typography — clamp() for responsive */
+            --font-display: 'Clash Display', sans-serif;
+            --font-body: 'Satoshi', sans-serif;
+            --title-size: clamp(2.2rem, 6vw, 5rem);
+            --h2-size: clamp(1.5rem, 4vw, 3rem);
+            --h3-size: clamp(1.1rem, 2.5vw, 1.6rem);
+            --body-size: clamp(0.8rem, 1.4vw, 1.05rem);
+            --small-size: clamp(0.65rem, 1vw, 0.85rem);
+            --label-size: clamp(0.6rem, 0.9vw, 0.75rem);
+
+            /* Spacing */
+            --slide-padding: clamp(1.5rem, 5vw, 5rem);
+            --content-gap: clamp(0.8rem, 2.5vw, 2.5rem);
+            --element-gap: clamp(0.3rem, 1vw, 1rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --duration-normal: 0.7s;
+            --duration-fast: 0.4s;
+        }
+
+        /* ===========================================
+           BASE STYLES
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            height: 100%;
+        }
+
+        /* ===========================================
+           SLIDE CONTAINER
+           =========================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            padding: var(--slide-padding);
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+        }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--gradient-accent);
+            z-index: 1000;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 12px var(--accent-glow-strong);
+        }
+
+        /* ===========================================
+           NAVIGATION DOTS
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: clamp(0.75rem, 2vw, 2rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .nav-dot.active {
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow-strong);
+            transform: scale(1.3);
+        }
+
+        .nav-dot:hover:not(.active) {
+            background: var(--text-secondary);
+            transform: scale(1.15);
+        }
+
+        /* ===========================================
+           SLIDE NUMBER
+           =========================================== */
+        .slide-number {
+            position: absolute;
+            bottom: clamp(1rem, 2vw, 2rem);
+            left: var(--slide-padding);
+            font-family: var(--font-display);
+            font-size: var(--small-size);
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-family: var(--font-display);
+            font-size: var(--title-size);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 600;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+        }
+
+        h3 {
+            font-family: var(--font-display);
+            font-size: var(--h3-size);
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        p, li {
+            font-size: var(--body-size);
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* ===========================================
+           LABEL / TAG
+           =========================================== */
+        .label {
+            display: inline-block;
+            font-family: var(--font-display);
+            font-size: var(--label-size);
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            padding: 0.4em 1em;
+            border-radius: 100px;
+            background: var(--accent-glow);
+            color: var(--accent);
+            border: 1px solid var(--border-accent);
+            margin-bottom: var(--element-gap);
+        }
+
+        .label--warm {
+            background: rgba(255, 107, 53, 0.12);
+            color: var(--accent-warm);
+            border-color: rgba(255, 107, 53, 0.3);
+        }
+
+        .label--blue {
+            background: rgba(0, 184, 255, 0.12);
+            color: var(--accent-secondary);
+            border-color: rgba(0, 184, 255, 0.3);
+        }
+
+        /* ===========================================
+           CARDS
+           =========================================== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: clamp(12px, 1.5vw, 20px);
+            padding: clamp(1rem, 2vw, 2rem);
+            transition: all 0.4s var(--ease-out-expo);
+        }
+
+        .card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-accent);
+            transform: translateY(-2px);
+        }
+
+        .card__icon {
+            width: clamp(36px, 4vw, 52px);
+            height: clamp(36px, 4vw, 52px);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.2rem, 2vw, 1.8rem);
+            margin-bottom: var(--element-gap);
+        }
+
+        .card__title {
+            font-family: var(--font-display);
+            font-size: var(--h3-size);
+            font-weight: 600;
+            margin-bottom: 0.3em;
+            color: var(--text-primary);
+        }
+
+        .card__desc {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ===========================================
+           GRID LAYOUTS
+           =========================================== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(0.75rem, 1.5vw, 1.5rem);
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(0.75rem, 1.5vw, 1.5rem);
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(0.5rem, 1vw, 1rem);
+        }
+
+        @media (max-width: 900px) {
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* ===========================================
+           TECH BADGE
+           =========================================== */
+        .tech-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            padding: 0.5em 1em;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            font-size: var(--small-size);
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .tech-badge:hover {
+            border-color: var(--border-accent);
+            background: var(--bg-card-hover);
+        }
+
+        .tech-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ===========================================
+           ARCHITECTURE DIAGRAM
+           =========================================== */
+        .arch-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(0.5rem, 1.5vw, 1.5rem);
+        }
+
+        .arch-box {
+            padding: clamp(0.6rem, 1.2vw, 1.2rem) clamp(1rem, 2vw, 2rem);
+            border-radius: 12px;
+            font-family: var(--font-display);
+            font-size: var(--small-size);
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .arch-box--accent {
+            background: var(--accent-glow);
+            border-color: var(--border-accent);
+            color: var(--accent);
+        }
+
+        .arch-box--blue {
+            background: rgba(0, 184, 255, 0.1);
+            border-color: rgba(0, 184, 255, 0.3);
+            color: var(--accent-secondary);
+        }
+
+        .arch-box--warm {
+            background: rgba(255, 107, 53, 0.1);
+            border-color: rgba(255, 107, 53, 0.3);
+            color: var(--accent-warm);
+        }
+
+        .arch-box--dark {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+        }
+
+        .arch-arrow {
+            font-size: clamp(1rem, 1.8vw, 1.5rem);
+            color: var(--text-muted);
+        }
+
+        .arch-arrow--down {
+            text-align: center;
+            padding: clamp(0.3rem, 0.5vw, 0.5rem) 0;
+        }
+
+        /* ===========================================
+           LIST STYLES
+           =========================================== */
+        .feature-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.4rem, 0.8vw, 0.8rem);
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6em;
+            font-size: var(--body-size);
+            line-height: 1.5;
+        }
+
+        .feature-list li::before {
+            content: '→';
+            color: var(--accent);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* ===========================================
+           STAT BLOCK
+           =========================================== */
+        .stat {
+            text-align: center;
+        }
+
+        .stat__number {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+
+        .stat__label {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            margin-top: 0.3em;
+        }
+
+        /* ===========================================
+           DIVIDER
+           =========================================== */
+        .divider {
+            width: 60px;
+            height: 3px;
+            background: var(--gradient-accent);
+            border-radius: 3px;
+            margin: var(--element-gap) 0;
+        }
+
+        /* ===========================================
+           BACKGROUND DECORATIONS
+           =========================================== */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .grid-bg {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        .noise-overlay {
+            position: absolute;
+            inset: 0;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.92);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(30px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal,
+        .slide.visible .reveal-scale,
+        .slide.visible .reveal-left,
+        .slide.visible .reveal-right {
+            opacity: 1;
+            transform: translate(0) scale(1);
+        }
+
+        /* Stagger delays */
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+        .delay-5 { transition-delay: 0.5s; }
+        .delay-6 { transition-delay: 0.6s; }
+        .delay-7 { transition-delay: 0.7s; }
+        .delay-8 { transition-delay: 0.8s; }
+
+        /* Floating animation for decorative elements */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ===========================================
+           SLIDE-SPECIFIC STYLES
+           =========================================== */
+
+        /* --- Title Slide --- */
+        .title-slide {
+            text-align: center;
+            align-items: center;
+        }
+
+        .title-slide h1 {
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .title-slide .subtitle {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-top: var(--element-gap);
+        }
+
+        .title-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            padding: 0.5em 1.2em;
+            border-radius: 100px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            margin-bottom: clamp(1rem, 2vw, 2rem);
+        }
+
+        .title-badge .pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse-glow 2s ease infinite;
+        }
+
+        /* --- Section Header --- */
+        .section-header {
+            margin-bottom: var(--content-gap);
+        }
+
+        /* --- CTA Slide --- */
+        .cta-slide {
+            text-align: center;
+            align-items: center;
+        }
+
+        .cta-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: var(--content-gap);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .cta-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            padding: 0.8em 1.6em;
+            border-radius: 12px;
+            font-family: var(--font-display);
+            font-size: var(--body-size);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .cta-link--primary {
+            background: var(--gradient-accent);
+            color: var(--bg-primary);
+        }
+
+        .cta-link--primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow-strong);
+        }
+
+        .cta-link--secondary {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+        }
+
+        .cta-link--secondary:hover {
+            border-color: var(--border-accent);
+            transform: translateY(-2px);
+        }
+
+        /* ===========================================
+           RESPONSIVE BREAKPOINTS
+           =========================================== */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(1rem, 3vw, 2.5rem);
+                --content-gap: clamp(0.5rem, 1.5vw, 1.5rem);
+                --title-size: clamp(1.8rem, 5vw, 3.5rem);
+                --h2-size: clamp(1.3rem, 3.5vw, 2.2rem);
+            }
+        }
+
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.4rem, 1vw, 1rem);
+                --title-size: clamp(1.4rem, 4.5vw, 2.5rem);
+                --body-size: clamp(0.7rem, 1.2vw, 0.9rem);
+            }
+            .nav-dots, .decorative { display: none; }
+        }
+
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2vw, 1rem);
+                --title-size: clamp(1.2rem, 4vw, 2rem);
+                --h2-size: clamp(1rem, 3vw, 1.5rem);
+                --body-size: clamp(0.65rem, 1vw, 0.8rem);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+
+        /* ===========================================
+           KEYBOARD HINT
+           =========================================== */
+        .keyboard-hint {
+            position: fixed;
+            bottom: clamp(1rem, 2vw, 2rem);
+            right: clamp(1rem, 2vw, 2rem);
+            font-size: var(--label-size);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4em;
+            z-index: 100;
+            opacity: 0.6;
+            transition: opacity 2s ease 5s;
+        }
+
+        .keyboard-hint kbd {
+            padding: 0.2em 0.5em;
+            border-radius: 4px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            font-family: var(--font-body);
+            font-size: inherit;
+        }
+
+        /* Two-column layout helper */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(1.5rem, 3vw, 3rem);
+            align-items: start;
+        }
+
+        @media (max-width: 800px) {
+            .two-col { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation Dots -->
+    <nav class="nav-dots" id="navDots"></nav>
+
+    <!-- Keyboard Hint -->
+    <div class="keyboard-hint">
+        <kbd>←</kbd> <kbd>→</kbd> 또는 스크롤로 탐색
+    </div>
+
+    <!-- ===================================================
+         SLIDE 1: TITLE
+         =================================================== -->
+    <section class="slide title-slide" data-slide="0">
+        <div class="glow-orb" style="width:500px;height:500px;background:var(--accent);top:-15%;right:-10%;"></div>
+        <div class="glow-orb" style="width:350px;height:350px;background:var(--accent-secondary);bottom:-10%;left:-5%;"></div>
+        <div class="grid-bg"></div>
+        <div class="noise-overlay"></div>
+
+        <div class="slide-content" style="align-items:center;">
+            <div class="title-badge reveal delay-1">
+                <span class="pulse"></span>
+                Production-Ready Template
+            </div>
+            <h1 class="reveal delay-2">Forge Template</h1>
+            <p class="subtitle reveal delay-3">Next.js + FastAPI 기반의<br>풀스택 게시판 플랫폼</p>
+            <div class="divider reveal delay-4" style="margin: var(--content-gap) auto;"></div>
+            <p class="reveal delay-5" style="font-size:var(--small-size);color:var(--text-muted);">2026 Project Overview</p>
+        </div>
+
+        <span class="slide-number">01 / 10</span>
+    </section>
+
+    <!-- ===================================================
+         SLIDE 2: PROBLEM & SOLUTION
+         =================================================== -->
+    <section class="slide" data-slide="1">
+        <div class="glow-orb" style="width:400px;height:400px;background:var(--accent-warm);top:10%;right:-5%;opacity:0.2;"></div>
+        <div class="noise-overlay"></div>
+
+        <div class="slide-content">
+            <div class="section-header">
+                <span class="label reveal">Why</span>
+                <h2 class="reveal delay-1">매번 처음부터<br>만들 필요 없습니다</h2>
+            </div>
+
+            <div class="two-col">
+                <div class="card reveal delay-2">
+                    <div class="card__icon" style="background:rgba(255,107,53,0.12);">🔥</div>
+                    <div class="card__title" style="color:var(--accent-warm);">문제</div>
+                    <ul class="feature-list" style="margin-top:0.5em;">
+                        <li>반복되는 인증/게시판 구현</li>
+                        <li>프론트·백엔드 통합 비용</li>
+                        <li>에디터·파일 업로드 매번 구축</li>
+                        <li>보안·모니터링 사후 적용</li>
+                    </ul>
+                </div>
+
+                <div class="card reveal delay-3">
+                    <div class="card__icon" style="background:var(--accent-glow);">✦</div>
+                    <div class="card__title" style="color:var(--accent);">해결</div>
+                    <ul class="feature-list" style="margin-top:0.5em;">
+                        <li>검증된 풀스택 템플릿 제공</li>
+                        <li>즉시 사용 가능한 게시판 시스템</li>
+                        <li>Tiptap 리치 에디터 내장</li>
+                        <li>보안·로깅 기본 탑재</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <span class="slide-number">02 / 10</span>
+    </section>
+
+    <!-- ===================================================
+         SLIDE 3: TECH STACK
+         =================================================== -->
+    <section class="slide" data-slide="2">
+        <div class="glow-orb" style="width:350px;height:350px;background:var(--accent-secondary);bottom:10%;left:5%;opacity:0.2;"></div>
+        <div class="noise-overlay"></div>
+
+        <div class="slide-content">
+            <div class="section-header">
+                <span class="label label--blue reveal">Stack</span>
+                <h2 class="reveal delay-1">모던 기술 스택</h2>
+            </div>
+
+            <div class="two-col reveal delay-2">
+                <!-- Frontend -->
+                <div>
+                    <h3 style="margin-bottom:0.8em;color:var(--accent);">Frontend</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                        <span class="tech-badge"><span class="dot" style="background:#000;"></span>Next.js 16</span>
+                        <span class="tech-badge"><span class="dot" style="background:#61dafb;"></span>React 19</span>
+                        <span class="tech-badge"><span class="dot" style="background:#3178c6;"></span>TypeScript</span>
+                        <span class="tech-badge"><span class="dot" style="background:#06b6d4;"></span>Tailwind 4</span>
+                        <span class="tech-badge"><span class="dot" style="background:#7c3aed;"></span>shadcn/ui</span>
+                        <span class="tech-badge"><span class="dot" style="background:#ef4444;"></span>React Query</span>
+                        <span class="tech-badge"><span class="dot" style="background:#8b5cf6;"></span>Tiptap</span>
+                        <span class="tech-badge"><span class="dot" style="background:#f59e0b;"></span>Zod</span>
+                    </div>
+                </div>
+
+                <!-- Backend -->
+                <div>
+                    <h3 style="margin-bottom:0.8em;color:var(--accent-secondary);">Backend</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                        <span class="tech-badge"><span class="dot" style="background:#009688;"></span>FastAPI</span>
+                        <span class="tech-badge"><span class="dot" style="background:#3776ab;"></span>Python 3.13</span>
+                        <span class="tech-badge"><span class="dot" style="background:#d63aff;"></span>SQLAlchemy</span>
+                        <span class="tech-badge"><span class="dot" style="background:#336791;"></span>PostgreSQL</span>
+                        <span class="tech-badge"><span class="dot" style="background:#003b57;"></span>SQLite</span>
+                        <span class="tech-badge"><span class="dot" style="background:#ff6f00;"></span>Alembic</span>
+                        <span class="tech-badge"><span class="dot" style="background:#43a047;"></span>JWT / bcrypt</span>
+                        <span class="tech-badge"><span class="dot" style="background:#e65100;"></span>Prometheus</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <span class="slide-number">03 / 10</span>
+    </section>
+
+    <!-- ===================================================
+         SLIDE 4: ARCHITECTURE
+         =================================================== -->
+    <section class="slide" data-slide="3">
+        <div class="grid-bg"></div>
+        <div class="noise-overlay"></div>
+
+        <div class="slide-content" style="align-items:center;">
+            <div class="section-header" style="text-align:center;">
+                <span class="label reveal">Architecture</span>
+                <h2 class="reveal delay-1">시스템 구조</h2>
+            </div>
+
+            <div class="reveal delay-2" style="display:flex;flex-direction:column;gap:clamp(0.6rem,1.2vw,1.2rem);align-items:center;width:100%;max-width:800px;">
+                <!-- Browser -->
+                <div class="arch-row">
+                    <div class="arch-box arch-box--dark" style="min-width:200px;">🌐 Browser (Client)</div>
+                </div>
+
+                <div class="arch-arrow--down">↓</div>
+
+                <!-- Frontend -->
+                <div class="arch-row" style="width:100%;justify-content:center;">
+                    <div class="arch-box arch-box--accent" style="flex:1;max-width:600px;">
+                        <div>⚡ Next.js 16 — App Router</div>
+                        <div style="font-size:var(--label-size);opacity:0.7;margin-top:0.3em;">SSR · Proxy · 로깅 · IP 블랙리스트</div>
+                    </div>
+                </div>
+
+                <div class="arch-arrow--down">↓ <span style="font-size:var(--label-size);color:var(--text-muted);">/_proxy</span></div>
+
+                <!-- Backend -->
+                <div class="arch-row" style="width:100%;justify-content:center;">
+                    <div class="arch-box arch-box--blue" style="flex:1;max-width:600px;">
+                        <div>🚀 FastAPI — REST API</div>
+                        <div style="font-size:var(--label-size);opacity:0.7;margin-top:0.3em;">JWT 인증 · RBAC · 미들웨어 · 모니터링</div>
+                    </div>
+                </div>
+
+                <div class="arch-arrow--down">↓</div>
+
+                <!-- Database -->
+                <div class="arch-row" style="gap:clamp(1rem,2vw,2rem);">
+                    <div class="arch-box arch-box--warm">
+                        <div>📦 System DB</div>
+                        <div style="font-size:var(--label-size);opacity:0.7;margin-top:0.2em;">SQLite — 사용자·게시판</div>
+                    </div>
+                    <div class="arch-box arch-box--warm">
+                        <div>🗄️ Domain DB</div>
+                        <div style="font-size:var(--label-size);opacity:0.7;margin-top:0.2em;">PostgreSQL — 비즈니스</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <span class="slide-number">04 / 10</span>
+    </section>
+
+    <!-- ===================================================
+         SLIDE 5: BOARD SYSTEM
+         =================================================== -->
+    <section class="slide" data-slide="4">
+        <div class="glow-orb" style="width:400px;height:400px;background:var(--accent);top:-10%;left:10%;opacity:0.15;"></div>
+        <div class="noise-overlay"></div>
+
+        <div class="slide-content">
+            <div class="section-header">
+                <span class="label reveal">Core Feature</span>
+                <h2 class="reveal delay-1">다목적 게시판 시스템</h2>
+                <p class="reveal delay-2" style="margin-top:0.3em;">5가지 게시판 타입으로 다양한 용도에 대응</p>
+            </div>
+
+            <div class="grid-3 reveal delay-3">
+                <div class="card">
+                    <div class="card__icon" style="background:var(--accent-glow);">💬</div>
+                    <div class="card__title">일반 게시판</div>
+                    <div class="card__desc">댓글/스레드 선택, 투표, 해시태그, 첨부파일 지원</div>
+                </div>
+                <div class="card">
+                    <div class="card__icon" style="background:rgba(255,107,53,0.12);">📢</div>
+                    <div class="card__title">공지사항</div>
+                    <div class="card__desc">상단 고정, 팝업 공지 기능으로 중요 정보 전달</div>
+                </div>
+                <div class="card">
+                    <div class="card__icon" style="background:rgba(0,184,255,0.12);">❓</div>
+                    <div class="card__title">Q&A</div>
+                    <div class="card__desc">질문-답변 구조, 답변 채택 기능으로 지식 관리</div>
+                </div>
+                <div class="card">
+                    <div class="card__icon" style="background:rgba(139,92,246,0.12);">📁</div>
+                    <div class="card__title">자료실</div>
+                    <div class="card__desc">파일 공유 특화, 다운로드 카운트 추적</div>
+                </div>
+                <div class="card">
+                    <div class="card__icon" style="background:rgba(236,72,153,0.12);">🧩</div>
+                    <div class="card__title">소스 템플릿</div>
+                    <div class="card__desc">코드 스니펫 공유, 언어별 분류 지원</div>
+                </div>
+                <div class="card">
+                    <div class="card__icon" style="background:rgba(245,158,11,0.12);">⚙️</div>
+                    <div class="card__title">보드별 설정</div>
+                    <div class="card__desc">권한·댓글깊이·첨부·정렬 등 개별 커스터마이징</div>
+                </div>
+            </div>
+        </div>
+
+        <span class="slide-number">05 / 10</span>
+    </section>
+
+    <!-- ===================================================
+         SLIDE 6: RICH EDITOR
+         =================================================== -->
+    <section class="slide" data-slide="5">
+        <div class="glow-orb" style="width:300px;height:300px;background:var(--accent-secondary);bottom:5%;right:5%;opacity:0.15;"></div>
+        <div class="noise-overlay"></div>
+
+        <div class="slide-content">
+            <div class="section-header">
+                <span class="label label--blue reveal">Editor</span>
+                <h2 class="reveal delay-1">Tiptap 리치 에디터</h2>
+                <p class="reveal delay-2" style="margin-top:0.3em;">20개 이상의 확장으로 풍부한 콘텐츠 작성</p>
+            </div>
+
+            <div class="grid-4 reveal delay-3">
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:clamp(1.5rem,2.5vw,2rem);margin-bottom:0.3em;">📝</div>
+                    <div class="card__title" style="font-size:var(--small-size);">서식</div>
+                    <div class="card__desc">굵기·기울임·목록·인용</div>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:clamp(1.5rem,2.5vw,2rem);margin-bottom:0.3em;">🖼️</div>
+                    <div class="card__title" style="font-size:var(--small-size);">미디어</div>
+                    <div class="card__desc">이미지·동영상·파일첨부</div>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:clamp(1.5rem,2.5vw,2rem);margin-bottom:0.3em;">📊</div>
+                    <div class="card__title" style="font-size:var(--small-size);">다이어그램</div>
+                    <div class="card__desc">Mermaid·KaTeX 수식</div>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:clamp(1.5rem,2.5vw,2rem);margin-bottom:0.3em;">💻</div>
+                    <div class="card__title" style="font-size:var(--small-size);">코드</div>
+                    <div class="card__desc">구문 강조·코드블록</div>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:clamp(1.5rem,2.5vw,2rem);margin-bottom:0.3em;">📋</div>
+                    <div class="card__title" style="font-size:var(--small-size);">표</div>
+                    <div class="card__desc">테이블 삽입·편집</div>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:clamp(1.5rem,2.5vw,2rem);margin-bottom:0.3em;">@</div>
+                    <div class="card__title" style="font-size:var(--small-size);">멘션</div>
+                    <div class="card__desc">사용자 언급·알림</div>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:clamp(1.5rem,2.5vw,2rem);margin-bottom:0.3em;">🔗</div>
+                    <div class="card__title" style="font-size:var(--small-size);">링크</div>
+                    <div class="card__desc">OpenGraph 프리뷰</div>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:clamp(1.5rem,2.5vw,2rem);margin-bottom:0.3em;">✂️</div>
+                    <div class="card__title" style="font-size:var(--small-size);">이미지 편집</div>
+                    <div class="card__desc">크롭·리사이즈</div>
+                </div>
+            </div>
+        </div>
+
+        <span class="slide-number">06 / 10</span>
+    </section>
+
+    <!-- ===================================================
+         SLIDE 7: AUTH & SECURITY
+         =================================================== -->
+    <section class="slide" data-slide="6">
+        <div class="glow-orb" style="width:400px;height:400px;background:var(--accent-warm);bottom:-10%;left:-5%;opacity:0.15;"></div>
+        <div class="noise-overlay"></div>
+
+        <div class="slide-content">
+            <div class="section-header">
+                <span class="label label--warm reveal">Security</span>
+                <h2 class="reveal delay-1">인증 & 보안</h2>
+            </div>
+
+            <div class="two-col">
+                <div class="reveal delay-2">
+                    <h3 style="margin-bottom:0.8em;">인증 시스템</h3>
+                    <ul class="feature-list">
+                        <li>JWT 액세스 + 리프레시 토큰</li>
+                        <li>bcrypt 패스워드 해싱</li>
+                        <li>역할 기반 접근 제어 (RBAC)</li>
+                        <li>로그인 이력 추적 (IP, UA)</li>
+                        <li>계정 잠금 (5회 실패 시)</li>
+                    </ul>
+                </div>
+
+                <div class="reveal delay-3">
+                    <h3 style="margin-bottom:0.8em;">보안 기능</h3>
+                    <ul class="feature-list">
+                        <li>IP 블랙리스트 (CIDR 지원)</li>
+                        <li>파일 업로드 확장자 차단</li>
+                        <li>CORS 정책 설정</li>
+                        <li>요청 로깅 & 모니터링</li>
+                        <li>슬로우 쿼리 감지 & 알림</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <span class="slide-number">07 / 10</span>
+    </section>
+
+    <!-- ===================================================
+         SLIDE 8: ADMIN & FEATURES
+         =================================================== -->
+    <section class="slide" data-slide="7">
+        <div class="glow-orb" style="width:350px;height:350px;background:var(--accent);top:5%;right:0;opacity:0.12;"></div>
+        <div class="noise-overlay"></div>
+
+        <div class="slide-content">
+            <div class="section-header">
+                <span class="label reveal">Admin</span>
+                <h2 class="reveal delay-1">관리 & 부가 기능</h2>
+            </div>
+
+            <div class="grid-3 reveal delay-2">
+                <div class="card">
+                    <div class="card__icon" style="background:var(--accent-glow);">👤</div>
+                    <div class="card__title">사용자 관리</div>
+                    <div class="card__desc">계정 생성·수정·잠금, 역할 변경, 비밀번호 초기화</div>
+                </div>
+                <div class="card">
+                    <div class="card__icon" style="background:rgba(0,184,255,0.12);">📋</div>
+                    <div class="card__title">게시판 관리</div>
+                    <div class="card__desc">CRUD, 드래그 앤 드롭 정렬, 권한 설정</div>
+                </div>
+                <div class="card">
+                    <div class="card__icon" style="background:rgba(255,107,53,0.12);">🛡️</div>
+                    <div class="card__title">보안 관리</div>
+                    <div class="card__desc">IP 블랙리스트, 요청 로그 모니터링</div>
+                </div>
+                <div class="card">
+                    <div class="card__icon" style="background:rgba(139,92,246,0.12);">💌</div>
+                    <div class="card__title">쪽지 시스템</div>
+                    <div class="card__desc">1:1 메시지, 읽음 상태, 안 읽은 메시지 수</div>
+                </div>
+                <div class="card">
+                    <div class="card__icon" style="background:rgba(236,72,153,0.12);">🏷️</div>
+                    <div class="card__title">해시태그</div>
+                    <div class="card__desc">태그 기반 분류, 자동완성, 태그별 필터링</div>
+                </div>
+                <div class="card">
+                    <div class="card__icon" style="background:rgba(245,158,11,0.12);">📈</div>
+                    <div class="card__title">모니터링</div>
+                    <div class="card__desc">Prometheus 메트릭, 일별 로그, 슬로우 요청 감지</div>
+                </div>
+            </div>
+        </div>
+
+        <span class="slide-number">08 / 10</span>
+    </section>
+
+    <!-- ===================================================
+         SLIDE 9: NUMBERS
+         =================================================== -->
+    <section class="slide" data-slide="8">
+        <div class="grid-bg"></div>
+        <div class="glow-orb" style="width:500px;height:500px;background:var(--accent);top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.08;"></div>
+        <div class="noise-overlay"></div>
+
+        <div class="slide-content" style="align-items:center;">
+            <div class="section-header" style="text-align:center;">
+                <span class="label reveal">Numbers</span>
+                <h2 class="reveal delay-1">한눈에 보는 규모</h2>
+            </div>
+
+            <div class="grid-4 reveal delay-2" style="max-width:900px;width:100%;">
+                <div class="stat">
+                    <div class="stat__number" data-count="40">40+</div>
+                    <div class="stat__label">API 엔드포인트</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__number" data-count="20">20+</div>
+                    <div class="stat__label">에디터 확장</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__number" data-count="21">21</div>
+                    <div class="stat__label">UI 컴포넌트</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__number" data-count="5">5</div>
+                    <div class="stat__label">게시판 타입</div>
+                </div>
+            </div>
+
+            <div class="grid-3 reveal delay-3" style="max-width:700px;width:100%;margin-top:var(--content-gap);">
+                <div class="card" style="text-align:center;padding:clamp(0.8rem,1.5vw,1.5rem);">
+                    <div class="card__title" style="font-size:var(--body-size);color:var(--accent);">듀얼 DB</div>
+                    <div class="card__desc">SQLite + PostgreSQL</div>
+                </div>
+                <div class="card" style="text-align:center;padding:clamp(0.8rem,1.5vw,1.5rem);">
+                    <div class="card__title" style="font-size:var(--body-size);color:var(--accent-secondary);">4단계 역할</div>
+                    <div class="card__desc">Admin → Tester</div>
+                </div>
+                <div class="card" style="text-align:center;padding:clamp(0.8rem,1.5vw,1.5rem);">
+                    <div class="card__title" style="font-size:var(--body-size);color:var(--accent-warm);">Async 전체</div>
+                    <div class="card__desc">비동기 I/O 기반</div>
+                </div>
+            </div>
+        </div>
+
+        <span class="slide-number">09 / 10</span>
+    </section>
+
+    <!-- ===================================================
+         SLIDE 10: CLOSING
+         =================================================== -->
+    <section class="slide cta-slide" data-slide="9">
+        <div class="glow-orb" style="width:600px;height:600px;background:var(--accent);top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.1;"></div>
+        <div class="glow-orb" style="width:300px;height:300px;background:var(--accent-secondary);top:20%;right:10%;opacity:0.1;"></div>
+        <div class="grid-bg"></div>
+        <div class="noise-overlay"></div>
+
+        <div class="slide-content" style="align-items:center;">
+            <span class="label reveal">Get Started</span>
+            <h2 class="reveal delay-1" style="font-size:var(--title-size);">바로 시작하세요</h2>
+            <p class="reveal delay-2" style="max-width:500px;text-align:center;margin-top:var(--element-gap);">
+                클론하고, 설정하고, 실행하세요.<br>
+                나머지는 Forge Template이 해결합니다.
+            </p>
+
+            <div class="reveal delay-3" style="margin-top:var(--content-gap);padding:clamp(0.8rem,1.5vw,1.5rem) clamp(1.5rem,3vw,3rem);background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:12px;font-family:monospace;font-size:var(--body-size);color:var(--accent);letter-spacing:0.03em;">
+                <span style="color:var(--text-muted);">$</span> git clone &amp;&amp; npm install &amp;&amp; npm run dev
+            </div>
+
+            <div class="cta-links reveal delay-4">
+                <span class="cta-link cta-link--primary">🚀 프로젝트 시작하기</span>
+                <span class="cta-link cta-link--secondary">📖 문서 보기</span>
+            </div>
+
+            <p class="reveal delay-5" style="font-size:var(--small-size);color:var(--text-muted);margin-top:var(--content-gap);">
+                Built with Next.js 16 · FastAPI · TypeScript · Python 3.13
+            </p>
+        </div>
+
+        <span class="slide-number">10 / 10</span>
+    </section>
+
+    <!-- ===================================================
+         JAVASCRIPT
+         =================================================== -->
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.progressBar = document.getElementById('progressBar');
+                this.navDotsContainer = document.getElementById('navDots');
+                this.currentSlide = 0;
+                this.isAnimating = false;
+                this.touchStartY = 0;
+
+                this.createNavDots();
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupWheelNav();
+                this.updateProgress();
+            }
+
+            /* --- Navigation Dots --- */
+            createNavDots() {
+                this.slides.forEach((_, i) => {
+                    const dot = document.createElement('button');
+                    dot.classList.add('nav-dot');
+                    if (i === 0) dot.classList.add('active');
+                    dot.setAttribute('aria-label', `슬라이드 ${i + 1}`);
+                    dot.addEventListener('click', () => this.goToSlide(i));
+                    this.navDotsContainer.appendChild(dot);
+                });
+                this.navDots = this.navDotsContainer.querySelectorAll('.nav-dot');
+            }
+
+            /* --- Intersection Observer for .visible class --- */
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            const index = parseInt(entry.target.dataset.slide);
+                            this.currentSlide = index;
+                            this.updateProgress();
+                            this.updateDots();
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            /* --- Keyboard Navigation --- */
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+                        e.preventDefault();
+                        this.nextSlide();
+                    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        this.prevSlide();
+                    } else if (e.key === 'Home') {
+                        e.preventDefault();
+                        this.goToSlide(0);
+                    } else if (e.key === 'End') {
+                        e.preventDefault();
+                        this.goToSlide(this.slides.length - 1);
+                    }
+                });
+            }
+
+            /* --- Touch / Swipe Navigation --- */
+            setupTouchNav() {
+                document.addEventListener('touchstart', (e) => {
+                    this.touchStartY = e.touches[0].clientY;
+                }, { passive: true });
+
+                document.addEventListener('touchend', (e) => {
+                    const diff = this.touchStartY - e.changedTouches[0].clientY;
+                    if (Math.abs(diff) > 50) {
+                        diff > 0 ? this.nextSlide() : this.prevSlide();
+                    }
+                }, { passive: true });
+            }
+
+            /* --- Mouse Wheel Navigation --- */
+            setupWheelNav() {
+                let lastWheel = 0;
+                document.addEventListener('wheel', (e) => {
+                    const now = Date.now();
+                    if (now - lastWheel < 800) return;
+                    lastWheel = now;
+
+                    if (e.deltaY > 30) this.nextSlide();
+                    else if (e.deltaY < -30) this.prevSlide();
+                }, { passive: true });
+            }
+
+            /* --- Navigation Methods --- */
+            goToSlide(index) {
+                if (index < 0 || index >= this.slides.length || this.isAnimating) return;
+                this.isAnimating = true;
+                this.currentSlide = index;
+                this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                this.updateProgress();
+                this.updateDots();
+                setTimeout(() => { this.isAnimating = false; }, 800);
+            }
+
+            nextSlide() { this.goToSlide(this.currentSlide + 1); }
+            prevSlide() { this.goToSlide(this.currentSlide - 1); }
+
+            /* --- Update UI --- */
+            updateProgress() {
+                const pct = ((this.currentSlide + 1) / this.slides.length) * 100;
+                this.progressBar.style.width = pct + '%';
+            }
+
+            updateDots() {
+                this.navDots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === this.currentSlide);
+                });
+            }
+        }
+
+        /* ===========================================
+           NUMBER COUNTER ANIMATION
+           =========================================== */
+        class CounterAnimation {
+            constructor() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            this.animateCounters(entry.target);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                document.querySelectorAll('[data-count]').forEach(el => observer.observe(el));
+            }
+
+            animateCounters(el) {
+                const target = parseInt(el.dataset.count);
+                const suffix = el.textContent.includes('+') ? '+' : '';
+                const duration = 1500;
+                const start = performance.now();
+
+                const animate = (now) => {
+                    const elapsed = now - start;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 4);
+                    const current = Math.round(target * eased);
+                    el.textContent = current + suffix;
+                    if (progress < 1) requestAnimationFrame(animate);
+                };
+
+                requestAnimationFrame(animate);
+            }
+        }
+
+        /* ===========================================
+           INITIALIZE
+           =========================================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            new SlidePresentation();
+            new CounterAnimation();
+        });
+    </script>
+</body>
+</html>
